@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RustCore | Undetected Private Software for Rust</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil:wght@500;700;900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ==========================================================================\n   TOKENS (Cyberpunk / Tactical Neon Red Theme)\n   ========================================================================== */
+:root{
+  --bg: #070608;
+  --bg-panel: #110d14;
+  --bg-panel-2: #1a121f;
+  --bg-panel-3: #241829;
+  --metal-line: rgba(255,50,50,0.08);
+  --metal-line-2: rgba(255,50,50,0.18);
+  --accent-1: #ff2a2a;
+  --accent-2: #ff5252;
+  --accent-3: #ff7676;
+  --text-main: #e6e1e8;
+  --text-muted: #8d8394;
+  --font-stencil: 'Big Shoulders Stencil', cursive;
+  --font-sans: 'IBM Plex Sans', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background-color: var(--bg);
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  line-height: 1.5;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: #33151b; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-1); }
+
+/* Utilities */
+.container { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+.badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 14px; background: rgba(255,42,42,0.1);
+  border: 1px solid rgba(255,42,42,0.3); border-radius: 4px;
+  font-family: var(--font-mono); font-size: 12px; color: var(--accent-2);
+  text-transform: uppercase; letter-spacing: 1px;
+}
+.badge-dot { width: 6px; height: 6px; background: var(--accent-1); border-radius: 50%; box-shadow: 0 0 8px var(--accent-1); }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 14px 32px; font-family: var(--font-mono); font-size: 14px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 1px; border: none; cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); text-decoration: none;
+  position: relative; overflow: hidden; clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+}
+.btn-primary {
+  background: var(--accent-1); color: #000; font-weight: 700;
+  box-shadow: 0 0 20px rgba(255,42,42,0.4);
+}
+.btn-primary:hover {
+  background: #ff4545; box-shadow: 0 0 35px rgba(255,42,42,0.8);
+  transform: translateY(-2px);
+}
+.btn-secondary {
+  background: var(--bg-panel-2); color: var(--text-main);
+  border: 1px solid var(--metal-line-2);
+}
+.btn-secondary:hover {
+  border-color: var(--accent-1); color: #fff;
+  background: var(--bg-panel-3); transform: translateY(-2px);
+}
+
+/* Header */
+header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(7,6,8,0.85); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--metal-line);
+}
+.header-inner { display: flex; align-items: center; justify-content: space-between; height: 80px; }
+.logo { font-family: var(--font-stencil); font-size: 32px; font-weight: 900; color: #fff; text-decoration: none; letter-spacing: 2px; }
+.logo span { color: var(--accent-1); }
+nav { display: flex; gap: 32px; }
+nav a { color: var(--text-muted); text-decoration: none; font-family: var(--font-mono); font-size: 13px; text-transform: uppercase; letter-spacing: 1px; transition: color 0.2s; }
+nav a:hover { color: var(--accent-1); }
+
+/* Hero Section */
+.hero {
+  padding: 180px 0 100px; position: relative;
+  background: radial-gradient(circle at 50% 20%, rgba(255,42,42,0.12) 0%, rgba(7,6,8,0) 70%);
+}
+.hero-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 60px; align-items: center; }
+.hero-title {
+  font-family: var(--font-stencil); font-size: 72px; line-height: 0.95;
+  text-transform: uppercase; margin: 20px 0; letter-spacing: 2px;
+}
+.hero-title span { color: var(--accent-1); display: block; }
+.hero-desc { font-size: 18px; color: var(--text-muted); margin-bottom: 40px; max-width: 540px; }
+.hero-actions { display: flex; gap: 16px; margin-bottom: 50px; }
+
+.status-card {
+  background: var(--bg-panel); border: 1px solid var(--metal-line-2);
+  padding: 24px; border-radius: 8px; position: relative;
+}
+.status-card::before {
+  content: ''; position: absolute; top: -1px; left: -1px; width: 40px; height: 1px; background: var(--accent-1);
+}
+.status-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-family: var(--font-mono); font-size: 13px; }
+.status-row:last-child { margin-bottom: 0; }
+.status-val { color: #fff; font-weight: 600; }
+.status-val.online { color: #00ff66; text-shadow: 0 0 10px rgba(0,255,102,0.4); }
+
+/* Features */
+.features { padding: 100px 0; border-top: 1px solid var(--metal-line); }
+.sec-title { font-family: var(--font-stencil); font-size: 48px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; }
+.sec-subtitle { color: var(--text-muted); font-family: var(--font-mono); font-size: 14px; margin-bottom: 60px; text-transform: uppercase; }
+
+.features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.feat-card {
+  background: var(--bg-panel); border: 1px solid var(--metal-line);
+  padding: 32px; transition: all 0.3s ease; position: relative;
+}
+.feat-card:hover { border-color: var(--metal-line-2); transform: translateY(-4px); background: var(--bg-panel-2); }
+.feat-num { font-family: var(--font-mono); font-size: 12px; color: var(--accent-1); margin-bottom: 16px; }
+.feat-title { font-size: 20px; font-weight: 700; margin-bottom: 12px; color: #fff; }
+.feat-desc { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+
+/* Pricing */
+.pricing { padding: 100px 0; background: rgba(17,13,20,0.5); border-top: 1px solid var(--metal-line); }
+.pricing-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+.price-card {
+  background: var(--bg-panel); border: 1px solid var(--metal-line);
+  padding: 32px 24px; display: flex; flex-direction: column; position: relative;
+}
+.price-card.popular {
+  border-color: var(--accent-1); background: var(--bg-panel-2);
+  box-shadow: 0 0 30px rgba(255,42,42,0.15);
+}
+.popular-tag {
+  position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+  background: var(--accent-1); color: #000; font-family: var(--font-mono);
+  font-size: 10px; font-weight: 700; padding: 2px 12px; text-transform: uppercase; letter-spacing: 1px;
+}
+.price-head { margin-bottom: 24px; }
+.price-name { font-family: var(--font-mono); font-size: 14px; color: var(--text-muted); text-transform: uppercase; }
+.price-val { font-family: var(--font-stencil); font-size: 44px; color: #fff; line-height: 1; margin-top: 8px; }
+.price-val span { font-size: 16px; font-family: var(--font-sans); color: var(--text-muted); }
+
+.price-list { list-style: none; margin-bottom: 32px; flex-grow: 1; }
+.price-list li { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.price-list li::before { content: '>'; color: var(--accent-1); font-weight: bold; font-family: var(--font-mono); }
+
+/* Reviews */
+.reviews { padding: 100px 0; border-top: 1px solid var(--metal-line); }
+.testi-card {
+  background: var(--bg-panel-2); border: 1px solid var(--metal-line-2);
+  padding: 40px; border-radius: 4px; max-width: 800px; margin: 0 auto; text-align: center;
+}
+.testi-text { font-size: 18px; font-style: italic; color: #fff; margin-bottom: 24px; }
+.testi-author { font-family: var(--font-mono); font-size: 14px; color: var(--accent-1); }
+.testi-dots { display: flex; justify-content: center; gap: 8px; margin-top: 24px; }
+.dot { width: 8px; height: 8px; background: var(--metal-line-2); border-radius: 50%; cursor: pointer; }
+.dot.active { background: var(--accent-1); box-shadow: 0 0 8px var(--accent-1); }
+
+/* FAQ */
+.faq { padding: 100px 0; border-top: 1px solid var(--metal-line); }
+.faq-list { max-width: 800px; margin: 0 auto; }
+.faq-item { border-bottom: 1px solid var(--metal-line); margin-bottom: 16px; }
+.faq-q {
+  padding: 20px 0; font-size: 18px; font-weight: 600; cursor: pointer;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.faq-q::after { content: '+'; font-family: var(--font-mono); color: var(--accent-1); font-size: 20px; }
+.faq-item.active .faq-q::after { content: '-'; }
+.faq-a { padding-bottom: 20px; color: var(--text-muted); font-size: 14px; display: none; }
+.faq-item.active .faq-a { display: block; }
+
+/* Modal */
+.modal-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(7,6,8,0.9); backdrop-filter: blur(8px);
+  display: none; align-items: center; justify-content: center; z-index: 1000;
+}
+.modal-content {
+  background: var(--bg-panel-2); border: 1px solid var(--metal-line-2);
+  padding: 40px; max-width: 480px; width: 100%; text-align: center; position: relative;
+}
+.modal-title { font-family: var(--font-stencil); font-size: 28px; margin-bottom: 20px; }
+.progress-bar-wrap { width: 100%; height: 6px; background: var(--bg); margin: 24px 0; overflow: hidden; }
+.progress-bar { width: 0%; height: 100%; background: var(--accent-1); transition: width 0.2s; box-shadow: 0 0 10px var(--accent-1); }
+.modal-status { font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); margin-bottom: 24px; }
+
+/* Footer */
+footer { padding: 40px 0; border-top: 1px solid var(--metal-line); text-align: center; color: var(--text-muted); font-family: var(--font-mono); font-size: 12px; }
+
+@media (max-width: 992px) {
+  .hero-grid { grid-template-columns: 1fr; }
+  .features-grid { grid-template-columns: 1fr; }
+  .pricing-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container header-inner">
+    <a href="#" class="logo">RUST<span>CORE</span></a>
+    <nav>
+      <a href="#features">Функционал</a>
+      <a href="#pricing">Тарифы</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <button class="btn btn-secondary download-trigger-btn" data-type="Free" style="padding: 10px 20px; font-size: 12px;">Скачать бесплатно</button>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container hero-grid">
+    <div>
+      <div class="badge"><span class="badge-dot"></span> Undetected v4.2</div>
+      <h1 class="hero-title">Полное доминирование <span>в мире Rust</span></h1>
+      <p class="hero-desc">Приватное программное обеспечение с аппаратным обходом античита EAC. Минимальный отклик, стабильный FPS и непревзойденная функциональность.</p>
+      <div class="hero-actions">
+        <button class="btn btn-primary download-trigger-btn" data-type="Paid">Получить доступ</button>
+        <button class="btn btn-secondary download-trigger-btn" data-type="Free">Скачать демо</button>
+      </div>
+    </div>
+    <div class="status-card">
+      <div class="status-row"><span>Античит Статус:</span> <span class="status-val online">UNDETECTED</span></div>
+      <div class="status-row"><span>Последнее обновление:</span> <span class="status-val">Сегодня</span></div>
+      <div class="status-row"><span>Версия игры:</span> <span class="status-val">Latest Steam</span></div>
+      <div class="status-row"><span>Ядро драйвера:</span> <span class="status-val">Ring-0 Kernel</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="features" id="features">
+  <div class="container">
+    <h2 class="sec-title">Функционал системы</h2>
+    <p class="sec-subtitle">// Разработано для максимального преимущества</p>
+    <div class="features-grid">
+      <div class="feat-card">
+        <div class="feat-num">01 / ESP & VISUALS</div>
+        <h3 class="feat-title">Advanced ESP</h3>
+        <p class="feat-desc">Отображение игроков, лута, ресурсов, техники и спавнов с точной настройкой дистанции и кастомизацией цветов.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-num">02 / AIMBOT</div>
+        <h3 class="feat-title">Vector & Silent Aimbot</h3>
+        <p class="feat-desc">Плавное наведение с компенсацией отдачи, прогнозированием траектории пули и проверкой видимости цели.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-num">03 / MISC</div>
+        <h3 class="feat-title">Radar & Utility</h3>
+        <p class="feat-desc">2D Радар, отключение качания прицела, всегда день, подсветка трупов и аирдропов на карте.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="pricing" id="pricing">
+  <div class="container">
+    <h2 class="sec-title">Тарифные планы</h2>
+    <p class="sec-subtitle">// Выберите оптимальный вариант подписки</p>
+    <div class="pricing-grid">
+      <div class="price-card">
+        <div class="price-head">
+          <div class="price-name">Free / Демо</div>
+          <div class="price-val">0 ₴ <span>/ ∞</span></div>
+        </div>
+        <ul class="price-list">
+          <li>Базовый Player ESP (Боксы)</li>
+          <li>Ограниченная дальность радара</li>
+          <li>Публичная поддержка в Discord</li>
+        </ul>
+        <button class="btn btn-secondary download-trigger-btn" data-type="Free">Скачать бесплатно</button>
+      </div>
+
+      <div class="price-card">
+        <div class="price-head">
+          <div class="price-name">1 День</div>
+          <div class="price-val">199 ₴ <span>/ 24ч</span></div>
+        </div>
+        <ul class="price-list">
+          <li>Полный доступ к ESP</li>
+          <li>Базовый Aimbot</li>
+          <li>Поддержка 24/7</li>
+        </ul>
+        <button class="btn btn-secondary download-trigger-btn" data-type="Paid">Купить доступ</button>
+      </div>
+
+      <div class="price-card popular">
+        <div class="popular-tag">Популярное</div>
+        <div class="price-head">
+          <div class="price-name">30 Дней</div>
+          <div class="price-val">799 ₴ <span>/ мес</span></div>
+        </div>
+        <ul class="price-list">
+          <li>Весь функционал софта</li>
+          <li>Приоритетные обновления</li>
+          <li>Приватно для каждого ПК</li>
+        </ul>
+        <button class="btn btn-primary download-trigger-btn" data-type="Paid">Приобрести PRO</button>
+      </div>
+
+      <div class="price-card">
+        <div class="price-head">
+          <div class="price-name">Lifetime</div>
+          <div class="price-val">2999 ₴ <span>/ навсегда</span></div>
+        </div>
+        <ul class="price-list">
+          <li>Вечный доступ ко всем версиям</li>
+          <li>VIP статус в сообществе</li>
+          <li>Персональный конфиг</li>
+        </ul>
+        <button class="btn btn-secondary download-trigger-btn" data-type="Paid">Навсегда</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="reviews">
+  <div class="container">
+    <div class="testi-card">
+      <p class="testi-text" id="testi-text">"Использую этот софт уже 3 месяца. Ни одного бана, плавный аимбот и невероятная оптимизация. Рекомендую всем!"</p>
+      <div class="testi-author" id="testi-author">— Player_1337</div>
+      <div class="testi-dots">
+        <span class="dot active" data-i="0"></span>
+        <span class="dot" data-i="1"></span>
+        <span class="dot" data-i="2"></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="faq" id="faq">
+  <div class="container">
+    <h2 class="sec-title" style="text-align: center;">Частые вопросы</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-q">Безопасно ли использовать софт?</div>
+        <div class="faq-a">Да, наш софт работает на уровне ядра (Ring-0) и использует уникальные алгоритмы обхода EAC, что снижает риск бана до минимума.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Как происходит запуск?</div>
+        <div class="faq-a">После скачивания лоадера вы входите в систему, запускаете софт, а затем запускаете саму игру Rust. Процесс максимально простой.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Поддерживаются ли системы Windows 10/11?</div>
+        <div class="faq-a">Да, софт полностью совместим со всеми версиями Windows 10 и Windows 11 (x64).</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p>&copy; 2026 RustCore Software. All rights reserved. Not affiliated with Facepunch Studios.</p>
+  </div>
+</footer>
+
+<div class="modal-overlay" id="download-modal">
+  <div class="modal-content">
+    <h3 class="modal-title" id="modal-title">Загрузка лоадера</h3>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar" id="modal-progress"></div>
+    </div>
+    <div class="modal-status" id="modal-status">Инициализация процесса...</div>
+    <button class="btn btn-primary" id="modal-close" style="display: none; width: 100%;">Закрыть</button>
+  </div>
+</div>
+
+<a id="hidden-download-link" href="Rust core.exe" download="Rust core.exe" style="display: none;"></a>
+
+<script>
+/* ---------- Testimonials slider ---------- */
+const testis = [
+  { text: '"Использую этот софт уже 3 месяца. Ни одного бана, плавный аимбот и невероятная оптимизация. Рекомендую всем!"', author: '— Player_1337' },
+  { text: '"Лучший ESP из всех, что я пробовал. Видно всё, фпс вообще не проседает."', author: '— NightRaider' },
+  { text: '"Техподдержка ответила и помогла всё настроить за 5 минут. Топ сервис!"', author: '— RustGod' }
+];
+let tIndex = 0;
+const tText = document.getElementById('testi-text');
+const tAuthor = document.getElementById('testi-author');
+const dots = document.querySelectorAll('.dot');
+
+function showTesti(idx) {
+  tIndex = idx;
+  tText.innerText = testis[idx].text;
+  tAuthor.innerText = testis[idx].author;
+  dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+}
+
+dots.forEach(d => d.addEventListener('click', () => showTesti(parseInt(d.dataset.i))));
+setInterval(() => showTesti((tIndex + 1) % testis.length), 5000);
+
+/* ---------- FAQ accordion ---------- */
+document.querySelectorAll('.faq-q').forEach(q => {
+  q.addEventListener('click', () => q.parentElement.classList.toggle('active'));
+});
+
+/* ---------- download modal & auto-download ---------- */
+const modal = document.getElementById('download-modal');
+const progressBar = document.getElementById('modal-progress');
+const statusText = document.getElementById('modal-status');
+const closeBtn = document.getElementById('modal-close');
+const downloadLink = document.getElementById('hidden-download-link');
+
+document.querySelectorAll('.download-trigger-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const isFree = btn.dataset.type === 'Free';
+    modal.style.display = 'flex'; 
+    progressBar.style.width = '0%'; 
+    closeBtn.style.display = 'none';
+    
+    statusText.innerText = isFree 
+      ? 'Подготовка бесплатного демо-билда...' 
+      : 'Генерация персонального билда...';
+
+    let progress = 0;
+    const iv = setInterval(() => {
+      progress += Math.floor(Math.random() * 12) + 5;
+      if (progress > 100) progress = 100;
+      progressBar.style.width = progress + '%';
+      
+      if (progress < 40) {
+        statusText.innerText = isFree ? 'Загрузка баз данных Lite-версии...' : 'Генерация персонального билда...';
+      } else if (progress < 80) {
+        statusText.innerText = 'Обфускация кода и упаковка драйвера...';
+      } else {
+        statusText.innerText = 'Готово! Загрузка защищенного лоадера...';
+      }
+
+      if (progress === 100) { 
+        clearInterval(iv); 
+        closeBtn.style.display = 'block'; 
+        
+        // Авто-скачивание файла Rust core.exe
+        if (downloadLink) {
+          downloadLink.click();
+        }
+      }
+    }, 250);
+  });
+});
+
+closeBtn.addEventListener('click', () => modal.style.display = 'none');
+modal.addEventListener('click', e => { if (e.target === modal) modal.style.display = 'none'; });
+</script>
+
+</body>
+</html>
